@@ -5,6 +5,9 @@ const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 const app = express()
+const articlesRouter = require('./articles/articles-router')
+
+
 
 const morganOption = (NODE_ENV === 'production')
   ? 'tiny'
@@ -14,9 +17,17 @@ app.use(morgan(morganOption))
 app.use(helmet())
 app.use(cors())
 
+
+app.use('/articles', articlesRouter)
+
 app.get('/', (req, res) => {
   res.send('Hello, world!')
 })
+
+app.get('/xss', (req, res) => {
+  res.cookie('secretToken', '1234567890');
+  res.sendFile(__dirname + '/xss-example.html');
+});
 
 app.use(function errorHandler(error, req, res, next) {
   let response
